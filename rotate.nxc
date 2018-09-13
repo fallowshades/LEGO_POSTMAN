@@ -1,0 +1,10 @@
+task main()
+{
+    OnFwd( OUT_C, 100);
+    Wait( 5000 );
+    Off( OUT_C );
+    OnFwd( OUT_BC, 100);
+    Wait( 5000 );
+    Off( OUT_BC );
+}
+
