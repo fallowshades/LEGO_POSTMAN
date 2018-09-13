@@ -1,10 +1,21 @@
+#include "NXCDefs.h"
+
+// Defining variable
+#define NEAR 15 //cm
+
 task main()
 {
-    OnFwd( OUT_C, 100);
-    Wait( 5000 );
-    Off( OUT_C );
-    OnFwd( OUT_BC, 100);
-    Wait( 5000 );
-    Off( OUT_BC );
+    // Activating sensor on port 1
+    SetSensorLowspeed(IN_1);
+
+    // Start drive loop
+    while(true){
+        OnFwd( OUT_BC, 100);
+        // When distance to object gets lower than NEAR. Turn.
+        while(SensorUS(IN_1)>NEAR);
+        Off( OUT_BC );
+        OnRev(OUT_C,100);
+        Wait(800);
+    }
 }
 
