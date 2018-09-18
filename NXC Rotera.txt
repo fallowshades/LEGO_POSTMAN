@@ -8,9 +8,9 @@ inline float graderTillTid(float vinkel){
     return sekunder;
 }
 
-sub siktaRoboten[float koordinater[]){
+sub void siktaRoboten[float koordinater[]){
 
-    if(Array[0] == 1){
+    if(koordinater[0] == 1){
     
 	/* Om roboten ska svänga höger, else if roboten ska svänga vänster. */
 	if(koordinater[1] > 0){
