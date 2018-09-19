@@ -1,0 +1,34 @@
+task
+turnleft ()
+{
+  Acquire (engineLock);
+  OnFwd (OUT_AB, 75, 3600);
+  Release (engineLock);
+}
+
+task
+find_shortest_distance ()
+{
+  Acquire (engineLock);
+
+  int currentDistance = SensorUS (IN_2);
+  int shortestDistance = currentDistance;
+
+  until (currentDistance != SensorUS (IN_2))
+  {
+	currentDistance = SensorUS (IN_2);
+
+	/*if current distance is less than shortestDistance */
+	if (currentDistance < shortestDistance)
+	  {
+	    shortestDistance = currentDistance;
+	  }
+
+	    }
+
+	    getInPlace ()
+	    {
+	    while (SensorUS (IN_2) != shortestDistance)
+	    {
+	    turnleft ()}
+	    }
