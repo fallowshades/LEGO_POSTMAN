@@ -22,3 +22,82 @@ inline float avstandTillTid(float avstand){
     float tid = (3000/2)*avstånd; /* Gissar på att det tar 3 sekunder att köra 2 meter */
     return tid;
 }
+
+float AngleCalculate(float x, float y)
+{
+ return atand(y-15/x);
+}
+float HypotenuseCalculate(float x, float y)
+{
+ return sqrt(x*x+y-15*y-15);
+}
+
+task
+turnleft ()
+{
+  Acquire (engineLock);
+  OnFwd (OUT_AB, 75, 3600);
+  Release (engineLock);
+}
+
+task
+find_shortest_distance ()
+{
+  Acquire (engineLock);
+
+  int currentDistance = SensorUS (IN_2);
+  int shortestDistance = currentDistance;
+
+  until (currentDistance != SensorUS (IN_2))
+  {
+	currentDistance = SensorUS (IN_2);
+
+	/*if current distance is less than shortestDistance */
+	if (currentDistance < shortestDistance)
+	  {
+	    shortestDistance = currentDistance;
+	  }
+
+	    }
+
+	    getInPlace ()
+	    {
+	    while (SensorUS (IN_2) != shortestDistance)
+	    {
+	    turnleft ()}
+	    }
+
+
+/* I funktionen nedanför använder vi vinkeln för att räkna ut hur länge roboten ska köra på ett hjul för att rikta sig mot målet.
+Vi låtsas som att det tar 500 milisekunder att vända 90 grader på 75% speed. */
+/* float tid = (3000/2)*avstånd; T.ex: Gissar på att det tar 3 sekunder att köra 2 meter */
+
+inline float graderTillTid(float vinkel){
+    float sekunder = (500/90)*vinkel;
+    return sekunder;
+}
+
+sub void siktaRoboten[float koordinater[]){
+
+    if(koordinater[0] == 1){
+
+    /* Om roboten ska svänga höger, else if roboten ska svänga vänster. */
+    if(koordinater[1] > 0){
+        OnFwd(OUT_A, 75);
+        Wait(graderTillTid(vinkel));
+        Off(OUT_A);
+    } else if (koordinater[1] < 0){
+	      OnFwd(OUT_B, 75);
+        Wait(graderTillTid(vinkel));
+        Off(OUT_B);
+    }
+}
+
+inline void drive(float tid){
+    OnFwd(OUT_AB, 100);
+    Wait(tid);
+    OnRev(OUT_AB, 100); /* Paketet är framme, och roboten backar tillbaka */
+    Wait(tid);
+    Off(OUT_AB);
+}
+
