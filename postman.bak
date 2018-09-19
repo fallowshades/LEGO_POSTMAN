@@ -1,0 +1,20 @@
+#include "NXCDefs.h"
+
+task main()
+{
+    float adress_1_koordinater[2] = {1, 2.5};
+    float adress_2_koordinater[2] = {1, -2.5};
+    float adress_3_koordinater[2] = {0, 2.5};
+    float adress_4_koordinater[2] = {0, -2.5};
+
+    float pytagoras_vinkel_avstand[2];
+
+    // Activating sensor on port 1
+    SetSensorLowspeed(IN_1);
+
+    startRiktning();
+    beraknaPythagoras(pytagoras_vinkel_avstand);
+    siktaRoboten(adress_1_koordinater[0], pytagoras_vinkel_avstand[0]);
+    koer(avstandTillTid(pytagoras_vinkel_avstand[1]);
+}
+

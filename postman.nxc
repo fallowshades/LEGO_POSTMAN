@@ -14,7 +14,11 @@ task main()
 
     startRiktning();
     beraknaPythagoras(pytagoras_vinkel_avstand);
-    siktaRoboten(adress_1_koordinater[0], pytagoras_vinkel_avstand[0]);
-    koer(avstandTillTid(pytagoras_vinkel_avstand[1]);
+    siktaRoboten(adress_1_koordinater, pytagoras_vinkel_avstand[0]);
+    drive(avstandTillTid(pytagoras_vinkel_avstand[1]);
 }
 
+inline float avstandTillTid(float avstand){
+    float tid = (3000/2)*avstånd; /* Gissar på att det tar 3 sekunder att köra 2 meter */
+    return tid;
+}
