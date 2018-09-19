@@ -1,0 +1,37 @@
+task turnleft()
+{
+  OnFwd (OUT_A, POWER);
+  OnRev (OUT_C, POWER);
+}
+
+task
+find_shortest_distance()
+{
+  int currentDistance = SensorUS (IN_2);	/*set distance to currentDistance */
+  int shortestDistance = currentDistance;
+
+  while (true)
+    {
+      /*if change in distance */
+      if (currentDistance != SensorUS (IN_2))
+	{
+	  currentDistance = SensorUS (IN_2);
+
+	  /*if current distance is less than shortestDistance */
+	  if (currentDistance < shortestDistance)
+	    {
+	      shortestDistance = currentDistance;
+	    }
+
+	}
+
+    }
+}
+
+getInPlace ()
+{
+  while (SensorUS (IN_2) != shortestDistance)
+    {
+      turnleft()
+    }
+}
