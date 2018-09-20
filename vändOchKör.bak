@@ -9,8 +9,6 @@ inline float graderTillTid(float vinkel){
 
 sub void siktaRoboten[float koordinater[]){
 
-    if(koordinater[0] == 1){
-
     /* Om roboten ska svänga höger, else if roboten ska svänga vänster. */
     if(koordinater[1] > 0){
         OnFwd(OUT_A, 75);
@@ -23,9 +21,8 @@ sub void siktaRoboten[float koordinater[]){
     }
 }
 
-inline void turnAndDrive(float tid){
+inline void drive(float tid){
     OnFwd(OUT_AB, 100);
-
     Wait(tid);
     OnRev(OUT_AB, 100); /* Paketet är framme, och roboten backar tillbaka */
     Wait(tid);
