@@ -2,49 +2,72 @@
 
 float AngleCalculate(float x, float y);
 float HypotenuseCalculate(float x, float y);
-void drive(float tid);
-float avstandTillTid(float avstand);
-float graderTillTid(float vinkel);
-void siktaRoboten(float vagg, float avstand, float vinkel);
+void drive(float distance);
+void aimRobot(float angle);
+float findMotorDegrees(float angle);
 void turnleft (void);
 void find_shortest_distance (void);
 void getInPlace (void);
+float drive(float distance);
 
 
 
 
 task main()
 {
-    float adress_1_koordinater[2] = {1, 2.5};
-    float adress_2_koordinater[2] = {1, -2.5};
-    float adress_3_koordinater[2] = {0, 2.5};
-    float adress_4_koordinater[2] = {0, -2.5};
+    int adress_1[2] = {1, 250};
+    int adress_2[2] = {1, -250};
+    int adress_3[2] = {0, 250};
+    int adress_4[2] = {0, -250};
 
     float pytagoras_vinkel_avstand[2];
+    int aktuellAdress[2] = { 0 };
+    
+    switch(1) /* Här lägger vi input */
+    {
+             for(int i = 0; i < 2; i++){
+                 case 1:
+                 aktuellAdress[i] = adress_1[i];
+                 break;
+                 case 2:
+                 aktuellAdress[i] = adress_2[i];
+                 break;
+                 case 3:
+                 aktuellAdress[i] = adress_3[i];
+                 break;
+                 case 4:
+                 aktuellAdress[i] = adress_4[i];
+                 break;
+             }
+    }
+
 
     // Activating sensor on port 1
     SetSensorLowspeed(IN_1);
     find_shortest_distance();
 
     // startRiktning();
-    pytagoras_vinkel_avstand[0] = AngleCalculate(adress_1_koordinater[1], 0.5);
-    pytagoras_vinkel_avstand[1] = HypotenuseCalculate(adress_1_koordinater[1], 0.5);
-    siktaRoboten(adress_1_koordinater[0], adress_1_koordinater[1], pytagoras_vinkel_avstand[0]);
+    pytagoras_vinkel_avstand[0] = AngleCalculate(aktuellAdress[1], 5);  /* ta in sensorns värde inte 5 cm */
+    pytagoras_vinkel_avstand[1] = HypotenuseCalculate(aktuellAdress[1], 5);
+    aimRobot(aktuellAdress[1], pytagoras_vinkel_avstand[0]);
     drive(pytagoras_vinkel_avstand[1]);
+    /* Lämna boken */
 }
 
 void turnleft(void)
 {
-    //Acquire (engineLock);
+    /* Acquire (engineLock); */
     OnFwd(OUT_AB, 75);
-    //Release (engineLock);
+    /* Release (engineLock); */
 }
 
 void find_shortest_distance (void)
 {
-    //Acquire (engineLock);
+    /* Acquire (engineLock); */
     int currentDistance = SensorUS (IN_2);
     int shortestDistance = currentDistance;
+    
+    /* Här måste roboten börja köra annars går inte loopen*/
 
     until (currentDistance != SensorUS (IN_2))
     {
@@ -66,19 +89,14 @@ void getInPlace (void)
 {
     while (SensorUS (IN_2) != shortestDistance)
     {
-        turnleft ()
+        turnleft ();
     }
 }
 */
 
-
-/* I funktionen nedanfï¿½r anvï¿½nder vi vinkeln fï¿½r att rï¿½kna ut hur lï¿½nge roboten ska kï¿½ra pï¿½ ett hjul fï¿½r att rikta sig mot mï¿½let.
-Vi lï¿½tsas som att det tar 500 milisekunder att vï¿½nda 90 grader pï¿½ 75% speed. */
-/* float tid = (3000/2)*avstï¿½nd; T.ex: Gissar pï¿½ att det tar 3 sekunder att kï¿½ra 2 meter */
-
 float AngleCalculate(float x, float y)
 {
-    return atan(y-15/x);
+    return atand(y-15/x);
 }
 
 float HypotenuseCalculate(float x, float y)
@@ -86,39 +104,35 @@ float HypotenuseCalculate(float x, float y)
     return sqrt(x*x+(y-15)*(y-15));
 }
 
-void drive(float avstand)
-{
-    float tid = avstandTillTid(avstand);
-    OnFwd(OUT_AB, 100);
-    Wait(tid);
-    OnRev(OUT_AB, 100); /* Paketet ï¿½r framme, och roboten backar tillbaka */
-    Wait(tid);
-    Off(OUT_AB);
+float drive(float distance){
+    float wheelCircumference = 17.6; /* pi*5.6 */
+    float motorDegrees = 360*distance / wheelCircumference;
+    ret
+    urn motorDegrees;
 }
 
-float avstandTillTid(float avstand)
-{
-    float tid_avstand = (3000/2)*avstand; /* Gissar pï¿½ att det tar 3 sekunder att kï¿½ra 2 meter */
-    return tid_avstand;
-}
-float graderTillTid(float vinkel){
-    float sekunder = (500/90)*vinkel;
-    return sekunder;
-}
-void siktaRoboten(float vagg, float avstand, float vinkel)
-{
+float findMotorDegrees(float angle){
 
-    if(vagg == 1){
+     float wheelCircumference = 17.6;
+     float piTrack = 63; /* Distance between wheels times pi*/
+     float circumferenceDistance = 2 * piTrack;
+     float motorDegrees = 360 * piTrack / wheelCircumference;
+     return motorDegrees;
 
-    /* Om roboten ska svï¿½nga hï¿½ger, else if roboten ska svï¿½nga vï¿½nster. */
-    if(avstand > 0){
-        OnFwd(OUT_A, 75);
-        Wait(graderTillTid(vinkel));
-        Off(OUT_A);
-    } else if (avstand < 0){
-	      OnFwd(OUT_B, 75);
-        Wait(graderTillTid(vinkel));
-        Off(OUT_B);
+}
+
+void aimRobot(float angle)
+{
+    float motorDegrees = findMotorDegrees(angle);
+
+    /* To right */
+    if(distance > 0){
+    
+        RotateMotor(OUT_B, -75, (180-motorDegrees));
+
+    /* To left */
+    } else if (distance < 0){
+        
+        RotateMotor(OUT_A, -75, (180-motorDegrees));
     }
- }
 }
