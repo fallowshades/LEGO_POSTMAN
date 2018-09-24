@@ -1,5 +1,18 @@
 #include "NXCDefs.h"
 
+float AngleCalculate(float x, float y);
+float HypotenuseCalculate(float x, float y);
+void drive(float tid);
+float avstandTillTid(float avstand);
+float graderTillTid(float vinkel);
+void siktaRoboten(float vagg, float avstand, float vinkel);
+void turnleft (void);
+void find_shortest_distance (void);
+void getInPlace (void);
+
+
+
+
 task main()
 {
     float adress_1_koordinater[2] = {1, 2.5};
@@ -11,14 +24,101 @@ task main()
 
     // Activating sensor on port 1
     SetSensorLowspeed(IN_1);
+    find_shortest_distance();
 
-    startRiktning();
-    beraknaPythagoras(pytagoras_vinkel_avstand);
-    siktaRoboten(adress_1_koordinater, pytagoras_vinkel_avstand[0]);
-    drive(avstandTillTid(pytagoras_vinkel_avstand[1]);
+    // startRiktning();
+    pytagoras_vinkel_avstand[0] = AngleCalculate(adress_1_koordinater[1], 0.5);
+    pytagoras_vinkel_avstand[1] = HypotenuseCalculate(adress_1_koordinater[1], 0.5);
+    siktaRoboten(adress_1_koordinater[0], adress_1_koordinater[1], pytagoras_vinkel_avstand[0]);
+    drive(pytagoras_vinkel_avstand[1]);
 }
 
-inline float avstandTillTid(float avstand){
-    float tid = (3000/2)*avstånd; /* Gissar på att det tar 3 sekunder att köra 2 meter */
-    return tid;
+void turnleft(void)
+{
+    //Acquire (engineLock);
+    OnFwd(OUT_AB, 75);
+    //Release (engineLock);
+}
+
+void find_shortest_distance (void)
+{
+    //Acquire (engineLock);
+    int currentDistance = SensorUS (IN_2);
+    int shortestDistance = currentDistance;
+
+    until (currentDistance != SensorUS (IN_2))
+    {
+        currentDistance = SensorUS (IN_2);
+
+        if (currentDistance < shortestDistance)
+        {
+            shortestDistance = currentDistance;
+        }
+    }
+    while (SensorUS (IN_2) != shortestDistance)
+    {
+        turnleft ();
+    }
+}
+
+/*
+void getInPlace (void)
+{
+    while (SensorUS (IN_2) != shortestDistance)
+    {
+        turnleft ()
+    }
+}
+*/
+
+
+/* I funktionen nedanfï¿½r anvï¿½nder vi vinkeln fï¿½r att rï¿½kna ut hur lï¿½nge roboten ska kï¿½ra pï¿½ ett hjul fï¿½r att rikta sig mot mï¿½let.
+Vi lï¿½tsas som att det tar 500 milisekunder att vï¿½nda 90 grader pï¿½ 75% speed. */
+/* float tid = (3000/2)*avstï¿½nd; T.ex: Gissar pï¿½ att det tar 3 sekunder att kï¿½ra 2 meter */
+
+float AngleCalculate(float x, float y)
+{
+    return atan(y-15/x);
+}
+
+float HypotenuseCalculate(float x, float y)
+{
+    return sqrt(x*x+(y-15)*(y-15));
+}
+
+void drive(float avstand)
+{
+    float tid = avstandTillTid(avstand);
+    OnFwd(OUT_AB, 100);
+    Wait(tid);
+    OnRev(OUT_AB, 100); /* Paketet ï¿½r framme, och roboten backar tillbaka */
+    Wait(tid);
+    Off(OUT_AB);
+}
+
+float avstandTillTid(float avstand)
+{
+    float tid_avstand = (3000/2)*avstand; /* Gissar pï¿½ att det tar 3 sekunder att kï¿½ra 2 meter */
+    return tid_avstand;
+}
+float graderTillTid(float vinkel){
+    float sekunder = (500/90)*vinkel;
+    return sekunder;
+}
+void siktaRoboten(float vagg, float avstand, float vinkel)
+{
+
+    if(vagg == 1){
+
+    /* Om roboten ska svï¿½nga hï¿½ger, else if roboten ska svï¿½nga vï¿½nster. */
+    if(avstand > 0){
+        OnFwd(OUT_A, 75);
+        Wait(graderTillTid(vinkel));
+        Off(OUT_A);
+    } else if (avstand < 0){
+	      OnFwd(OUT_B, 75);
+        Wait(graderTillTid(vinkel));
+        Off(OUT_B);
+    }
+ }
 }
