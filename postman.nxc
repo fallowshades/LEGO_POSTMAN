@@ -35,14 +35,14 @@ task main()
 
 void turnleft(void)
 {
-    //Acquire (engineLock);
+    /* Acquire (engineLock); */
     OnFwd(OUT_AB, 75);
-    //Release (engineLock);
+    /* Release (engineLock); */
 }
 
 void find_shortest_distance (void)
 {
-    //Acquire (engineLock);
+    /* Acquire (engineLock); */
     int currentDistance = SensorUS (IN_2);
     int shortestDistance = currentDistance;
 
@@ -78,7 +78,7 @@ Vi l�tsas som att det tar 500 milisekunder att v�nda 90 grader p� 75% spee
 
 float AngleCalculate(float x, float y)
 {
-    return atan(y-15/x);
+    return atand(y-15/x);
 }
 
 float HypotenuseCalculate(float x, float y)
@@ -105,20 +105,30 @@ float graderTillTid(float vinkel){
     float sekunder = (500/90)*vinkel;
     return sekunder;
 }
+
+float vinkelTillRotation(float vinkel){
+    float rotation = ; /*Amirans matte. hjulstorlek, rotationer, distans mellan hjul */
+    return rotation;
+}
 void siktaRoboten(float vagg, float avstand, float vinkel)
 {
 
-    if(vagg == 1){
 
     /* Om roboten ska sv�nga h�ger, else if roboten ska sv�nga v�nster. */
     if(avstand > 0){
         OnFwd(OUT_A, 75);
         Wait(graderTillTid(vinkel));
         Off(OUT_A);
+        
+        
+        float rotation = vinkelTillRotation(vinkel);
+        RotateMotor(OUT_A, 75, rotation);
+        
     } else if (avstand < 0){
 	      OnFwd(OUT_B, 75);
         Wait(graderTillTid(vinkel));
         Off(OUT_B);
+        
+        RotateMotor(OUT_B, 75, 3600)
     }
- }
 }
