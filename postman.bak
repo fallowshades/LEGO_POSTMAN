@@ -9,7 +9,11 @@ void turnleft (void);
 void find_shortest_distance (void);
 void getInPlace (void);
 float drive(float distance);
+mutex EngineLock;
 
+int find_distance_on;
+int currentDistance = SensorUS (IN_2);
+int shortestDistance = currentDistance;
 
 
 
@@ -44,7 +48,8 @@ task main()
 
     // Activating sensor on port 1
     SetSensorLowspeed(IN_1);
-    find_shortest_distance();
+    find_distance_on = 1;       /*start find_shortest_distance */
+    Precedes(turn_left, find_shortest_distance)
 
     // startRiktning();
     pytagoras_vinkel_avstand[0] = AngleCalculate(aktuellAdress[1], 5);  /* ta in sensorns värde inte 5 cm */
@@ -54,14 +59,18 @@ task main()
     /* Lämna boken */
 }
 
-void turnleft(void)
+task turnleft()
 {
-    /* Acquire (engineLock); */
-    OnFwd(OUT_AB, 75);
-    /* Release (engineLock); */
+      while(true)
+      {
+         Acquire (engineLock);
+         OnFwd(OUT_AB, 75);
+         Wait(1000)
+         Release (engineLock);
+      }
 }
 
-void find_shortest_distance (void)
+task find_shortest_distance ()
 {
     /* Acquire (engineLock); */
     int currentDistance = SensorUS (IN_2);
@@ -78,19 +87,25 @@ void find_shortest_distance (void)
             shortestDistance = currentDistance;
         }
     }
-    while (SensorUS (IN_2) != shortestDistance)
+    /*while (SensorUS (IN_2) != shortestDistance)
     {
         turnleft ();
-    }
+    }      */
+    Release (engineLock);
 }
 
 /*
-void getInPlace (void)
+task getInPlace ()
 {
+  while(true)
+  {
+  Acquire (engineLock);
     while (SensorUS (IN_2) != shortestDistance)
     {
         turnleft ();
     }
+    
+  }
 }
 */
 
@@ -128,11 +143,11 @@ void aimRobot(float angle)
     /* To right */
     if(distance > 0){
     
-        RotateMotor(OUT_B, -75, (180-motorDegrees));
+        RotateMotor(OUT_A, 75, (180-motorDegrees));
 
     /* To left */
     } else if (distance < 0){
         
-        RotateMotor(OUT_A, -75, (180-motorDegrees));
+        RotateMotor(OUT_B, 75, (180-motorDegrees));
     }
 }

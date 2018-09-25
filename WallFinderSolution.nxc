@@ -7,6 +7,7 @@ task turn_left()
          Wait(10)
          Release (engineLock);
       }
+       precedes(main);
 }
 
 task find_shortest_distance ()
@@ -27,25 +28,13 @@ while(find_distance_on = 1)
     }
         if(SensorUS(IN_2) = shortestDistance)
         {
-              find_distance_on = 0;
+              find_distance_on = 0;      /*end of task*/
 
         }
     Release (engineLock);
  }
+ 
+ precedes(main);
 }
 
-
-
-task getInPlace ()
-{
-  while(true)
-  {
-  Acquire (engineLock);
-    while (SensorUS (IN_2) != shortestDistance)
-    {
-        turnleft ();
-    }
-
-  }
-}
 

@@ -1,21 +1,22 @@
-task turn_left()
+task turnleft()
 {
-      while(find_distance_on = 1)
+      while(true)
       {
          Acquire (engineLock);
          OnFwd(OUT_AB, 75);
-         Wait(10)
+         Wait(1000)
          Release (engineLock);
       }
 }
 
 task find_shortest_distance ()
 {
+    /* Acquire (engineLock); */
+    int currentDistance = SensorUS (IN_2);
+    int shortestDistance = currentDistance;
 
+    /* Här måste roboten börja köra annars går inte loopen*/
 
-while(find_distance_on = 1)
- {
-    Acquire (engineLock);
     until (currentDistance != SensorUS (IN_2))
     {
         currentDistance = SensorUS (IN_2);
@@ -25,17 +26,14 @@ while(find_distance_on = 1)
             shortestDistance = currentDistance;
         }
     }
-        if(SensorUS(IN_2) = shortestDistance)
-        {
-              find_distance_on = 0;
-
-        }
+    /*while (SensorUS (IN_2) != shortestDistance)
+    {
+        turnleft ();
+    }      */
     Release (engineLock);
- }
 }
 
-
-
+/*
 task getInPlace ()
 {
   while(true)
@@ -48,4 +46,4 @@ task getInPlace ()
 
   }
 }
-
+*/

@@ -1,8 +1,8 @@
 float AngleCalculate(float x, float y)
 {
- return atand(y/x);
+ return atand(y-15/x);
 }
 float HypotenuseCalculate(float x, float y)
 {
- return sqrt(x*x+y*y);
+ return sqrt(x*x+y-15*y-15);
 }
