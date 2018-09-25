@@ -3,22 +3,23 @@
 float AngleCalculate(float x, float y);
 float HypotenuseCalculate(float x, float y);
 void drive(float distance);
-void aimRobot(float angle);
+void aimRobot(float distance, float angle);
 float findMotorDegrees(float angle);
 void turnleft (void);
 void find_shortest_distance (void);
 void getInPlace (void);
-float drive(float distance);
-mutex EngineLock;
+float driveStraight(float distance);
+void findNearestWall();
 
 int find_distance_on;
-int currentDistance = SensorUS (IN_2);
-int shortestDistance = currentDistance;
+int currentDistance;
+int shortestDistance;
 
 
 
 task main()
 {
+
     int adress_1[2] = {1, 250};
     int adress_2[2] = {1, -250};
     int adress_3[2] = {0, 250};
@@ -48,60 +49,48 @@ task main()
 
     // Activating sensor on port 1
     SetSensorLowspeed(IN_1);
+    currentDistance = SensorUS(IN_1);
+    shortestDistance = currentDistance;
     find_distance_on = 1;       /*start find_shortest_distance */
-    Precedes(turn_left, find_shortest_distance);
-
-    // startRiktning();
-    pytagoras_vinkel_avstand[0] = AngleCalculate(aktuellAdress[1], 5);  /* ta in sensorns värde inte 5 cm */
+    findNearestWall();
+    /*
+    startRiktning();
+    pytagoras_vinkel_avstand[0] = AngleCalculate(aktuellAdress[1], 5);
     pytagoras_vinkel_avstand[1] = HypotenuseCalculate(aktuellAdress[1], 5);
-    aimRobot(aktuellAdress[1], pytagoras_vinkel_avstand[0]);
-    drive(pytagoras_vinkel_avstand[1]);
-    /* Lämna boken */
+    aimRobot(pytagoras_vinkel_avstand[1], pytagoras_vinkel_avstand[0]);
+    driveStraight(pytagoras_vinkel_avstand[1]);
+    */
 }
 
-task turn_left()
-{
-      while(find_distance_on = 1)
-      {
-         Acquire (engineLock);
-         OnFwd(OUT_AB, 75);
-         Wait(10)
-         Release (engineLock);
-      }
-       precedes(main);
-}
+void findNearestWall(){
 
-task find_shortest_distance ()
-{
+    while(find_distance_on == 1){
+        currentDistance = SensorUS(IN_1);
+
+        
+
+        if(currentDistance >= 40 && currentDistance <= 60){
 
 
-while(find_distance_on = 1)
- {
-    Acquire (engineLock);
-    until (currentDistance != SensorUS (IN_2))
-    {
-        currentDistance = SensorUS (IN_2);
-
-        if (currentDistance < shortestDistance)
-        {
-            shortestDistance = currentDistance;
+            if (currentDistance < shortestDistance){
+                shortestDistance = currentDistance;
+            }
+        }
+        if(shortestDistance <= 60 && currentDistance > shortestDistance){
+            find_distance_on = 0;      /*end of loop*/
+            OnFwd(OUT_A, -75);
+            Wait(500);
+            Off(OUT_A);
+        } else {
+            OnFwd(OUT_A, 75);
+            Wait(500);         /* Motorrevs ist */
+            Off(OUT_A);
         }
     }
-        if(SensorUS(IN_2) = shortestDistance)
-        {
-              find_distance_on = 0;      /*end of task*/
-
-        }
-    Release (engineLock);
- }
-
- precedes(main);
 }
 
 
-
-float AngleCalculate(float x, float y)
-{
+float AngleCalculate(float x, float y){
     return atand(y-15/x);
 }
 
@@ -110,11 +99,10 @@ float HypotenuseCalculate(float x, float y)
     return sqrt(x*x+(y-15)*(y-15));
 }
 
-float drive(float distance){
+float driveStraight(float distance){
     float wheelCircumference = 17.6; /* pi*5.6 */
-    float motorDegrees = 360*distance / wheelCircumference;
-    ret
-    urn motorDegrees;
+    float motorDegrees = (360*distance/wheelCircumference);
+    return motorDegrees;
 }
 
 float findMotorDegrees(float angle){
@@ -127,7 +115,7 @@ float findMotorDegrees(float angle){
 
 }
 
-void aimRobot(float angle)
+void aimRobot(float distance, float angle)
 {
     float motorDegrees = findMotorDegrees(angle);
 
