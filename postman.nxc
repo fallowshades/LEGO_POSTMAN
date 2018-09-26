@@ -1,34 +1,59 @@
 #include "NXCDefs.h"
 
-float AngleCalculate(float x, float y);
-float HypotenuseCalculate(float x, float y);
-void drive(float distance);
-void aimRobot(float distance, float angle);
-float findMotorDegrees(float angle);
-void turnleft (void);
-void find_shortest_distance (void);
-void getInPlace (void);
-float driveStraight(float distance);
-void findNearestWall();
+//float AngleCalculate(float x, float y);
+//float HypotenuseCalculate(float x, float y);
+//void drive(float distance);
+//void aimRobot(float distance, float angle);
+//float findMotorDegrees(float angle);
+//void turnleft (void);
+//void find_shortest_distance (void);
+//void getInPlace (void);
+//float driveStraight(float distance);
+//void findNearestWall();
 
 int find_distance_on;
 int currentDistance;
 int shortestDistance;
 
 
+inline void findNearestWall(){
+
+    while(find_distance_on == 1){
+        currentDistance = SensorUS(IN_1);
+
+        if(currentDistance >= 40 && currentDistance <= 60){
+
+
+            if (currentDistance < shortestDistance){
+                shortestDistance = currentDistance;
+            }
+        }
+        if(shortestDistance <= 60 && currentDistance > shortestDistance){
+            find_distance_on = 0;      // end of loop
+            OnFwd(OUT_A, -75);
+            Wait(500);
+            Off(OUT_A);
+        } else {
+            OnFwd(OUT_A, 75);
+            Wait(500);         // Motorrevs ist
+            Off(OUT_A);
+        }
+    }
+
+}
 
 task main()
 {
 
-    int adress_1[2] = {1, 250};
-    int adress_2[2] = {1, -250};
-    int adress_3[2] = {0, 250};
-    int adress_4[2] = {0, -250};
+    //int adress_1[2] = {1, 250};
+    //int adress_2[2] = {1, -250};
+    //int adress_3[2] = {0, 250};
+    //int adress_4[2] = {0, -250};
 
-    float pytagoras_vinkel_avstand[2];
-    int aktuellAdress[2] = { 0 };
+    //float pytagoras_vinkel_avstand[2];
+    //int aktuellAdress[2] = ;
     
-    switch(1) /* Här lägger vi input */
+    /*switch(1) Här lägger vi input
     {
              for(int i = 0; i < 2; i++){
                  case 1:
@@ -44,7 +69,7 @@ task main()
                  aktuellAdress[i] = adress_4[i];
                  break;
              }
-    }
+    }*/
 
 
     // Activating sensor on port 1
@@ -62,45 +87,16 @@ task main()
     */
 }
 
-void findNearestWall(){
 
-    while(find_distance_on == 1){
-        currentDistance = SensorUS(IN_1);
-
-        
-
-        if(currentDistance >= 40 && currentDistance <= 60){
-
-
-            if (currentDistance < shortestDistance){
-                shortestDistance = currentDistance;
-            }
-        }
-        if(shortestDistance <= 60 && currentDistance > shortestDistance){
-            find_distance_on = 0;      /*end of loop*/
-            OnFwd(OUT_A, -75);
-            Wait(500);
-            Off(OUT_A);
-        } else {
-            OnFwd(OUT_A, 75);
-            Wait(500);         /* Motorrevs ist */
-            Off(OUT_A);
-        }
-    }
-}
-
-
+/*
 float AngleCalculate(float x, float y){
     return atand(y-15/x);
 }
 
 float HypotenuseCalculate(float x, float y)
 {
-    return sqrt(x*x+(y-15)*(y-15));
-}
-
-float driveStraight(float distance){
-    float wheelCircumference = 17.6; /* pi*5.6 */
+    return sqrt(x*x+(y-15)*(y-15));loat driveStraight(float distance){
+    float wheelCircumference = 17.6; // pi*5.6 
     float motorDegrees = (360*distance/wheelCircumference);
     return motorDegrees;
 }
@@ -108,7 +104,7 @@ float driveStraight(float distance){
 float findMotorDegrees(float angle){
 
      float wheelCircumference = 17.6;
-     float piTrack = 63; /* Distance between wheels times pi*/
+     float piTrack = 63; // Distance between wheels times pi
      float circumferenceDistance = 2 * piTrack;
      float motorDegrees = 360 * piTrack / wheelCircumference;
      return motorDegrees;
@@ -119,14 +115,15 @@ void aimRobot(float distance, float angle)
 {
     float motorDegrees = findMotorDegrees(angle);
 
-    /* To right */
+     // To right
     if(distance > 0){
     
         RotateMotor(OUT_A, 75, (180-motorDegrees));
 
-    /* To left */
+    // To left
     } else if (distance < 0){
         
         RotateMotor(OUT_B, 75, (180-motorDegrees));
     }
 }
+*/
