@@ -4,7 +4,7 @@
 //float HypotenuseCalculate(float x, float y);
 //void drive(float distance);
 //void aimRobot(float distance, float angle);
-//float findMotorDegrees(float angle);
+float findMotorDegrees(float angle);
 //void turnleft (void);
 //void find_shortest_distance (void);
 //void getInPlace (void);
@@ -17,26 +17,30 @@ int shortestDistance;
 
 
 inline void findNearestWall(){
+    float motorDegrees = findMotorDegrees(7);
+
 
     while(find_distance_on == 1){
         currentDistance = SensorUS(IN_1);
+        Wait(1000);
+        NumOut(0,0,currentDistance);
 
-        if(currentDistance >= 40 && currentDistance <= 60){
+        if(currentDistance <= 55 && currentDistance < shortestDistance){
+            shortestDistance = currentDistance;
 
+            RotateMotor(OUT_B, 100, motorDegrees);
+            Off(OUT_B);
 
-            if (currentDistance < shortestDistance){
-                shortestDistance = currentDistance;
-            }
         }
-        if(shortestDistance <= 60 && currentDistance > shortestDistance){
-            find_distance_on = 0;      // end of loop
-            OnFwd(OUT_A, -75);
-            Wait(500);
-            Off(OUT_A);
-        } else {
-            OnFwd(OUT_A, 75);
-            Wait(500);         // Motorrevs ist
-            Off(OUT_A);
+        else if(shortestDistance <= 55 && currentDistance > shortestDistance){
+              find_distance_on = 0;      // end of loop
+              //OnFwd(OUT_B, -75);
+              RotateMotor(OUT_B, -100, motorDegrees);
+              Off(OUT_B);
+        }
+        else {
+          RotateMotor(OUT_B, 100, motorDegrees);
+          Off(OUT_B);
         }
     }
 
@@ -52,8 +56,8 @@ task main()
 
     //float pytagoras_vinkel_avstand[2];
     //int aktuellAdress[2] = ;
-    
-    /*switch(1) Här lägger vi input
+
+    /*switch(1) Hï¿½r lï¿½gger vi input
     {
              for(int i = 0; i < 2; i++){
                  case 1:
@@ -96,34 +100,33 @@ float AngleCalculate(float x, float y){
 float HypotenuseCalculate(float x, float y)
 {
     return sqrt(x*x+(y-15)*(y-15));loat driveStraight(float distance){
-    float wheelCircumference = 17.6; // pi*5.6 
+    float wheelCircumference = 17.6; // pi*5.6
     float motorDegrees = (360*distance/wheelCircumference);
     return motorDegrees;
 }
 
-float findMotorDegrees(float angle){
-
-     float wheelCircumference = 17.6;
-     float piTrack = 63; // Distance between wheels times pi
-     float circumferenceDistance = 2 * piTrack;
-     float motorDegrees = 360 * piTrack / wheelCircumference;
-     return motorDegrees;
-
-}
-
-void aimRobot(float distance, float angle)
-{
+void aimRobot(float distance, float angle){
     float motorDegrees = findMotorDegrees(angle);
 
      // To right
     if(distance > 0){
-    
+
         RotateMotor(OUT_A, 75, (180-motorDegrees));
 
     // To left
     } else if (distance < 0){
-        
+
         RotateMotor(OUT_B, 75, (180-motorDegrees));
     }
 }
 */
+
+float findMotorDegrees(float angle){
+
+     float wheelCircumference = 17.6;
+     float piTrack = 53.4; // Distance between wheels times pi
+     float circumferenceDistance = 2 * piTrack;
+     float motorDegrees = angle * circumferenceDistance / wheelCircumference;
+     return motorDegrees;
+
+}
