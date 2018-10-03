@@ -4,7 +4,9 @@
 //float HypotenuseCalculate(float x, float y);
 void aimRobot(float distance, float angle);
 float findMotorDegrees(float angle);
-void driveStraight(float distance);
+int driveStraight(float distance);
+void driveBack(float distance);
+void dropBook(void);
 int findNearestWall(void);
 
 int find_distance_on;
@@ -44,18 +46,24 @@ task main()
 
     // Activating sensor on port 1
     SetSensorLowspeed(IN_1);
+    SetSensor(IN_2,SENSOR_TOUCH);
+    SetSensor(IN_3,SENSOR_TOUCH);
     distanceToWall = findNearestWall();
     //pytagoras_vinkel_avstand[0] = AngleCalculate(aktuellAdress[1], distanceToWall);
     //pytagoras_vinkel_avstand[1] = HypotenuseCalculate(aktuellAdress[1], distanceToWall);
-    aimRobot(280, 79);
-    driveStraight(4000);
+    aimRobot(250, 90);
+    int h = driveStraight(4000);
+    dropBook();
+    driveBack(4000);
+    aimRobot(250, -90);
+
     //driveStraight(pytagoras_vinkel_avstand[1]);
 }
 
 int findNearestWall(void){
     int currentDistance;
     int shortestDistance;
-    float motorDegrees = findMotorDegrees(10);
+    float motorDegrees = findMotorDegrees(9);
 
     OnFwd(OUT_B, 40);
     while (SensorUS(IN_1)<60);
@@ -70,16 +78,39 @@ int findNearestWall(void){
       Off(OUT_B);
       currentDistance = SensorUS(IN_1);
     }while (shortestDistance>=currentDistance);
-
     RotateMotor(OUT_B, -30, (motorDegrees*3));
+    OnFwdSync(OUT_AB, 80, 0);
+    until (SENSOR_3 == 1 || SENSOR_2 == 1);
+    if(SENSOR_3 == 1){
+      Off(OUT_B);
+      until (SENSOR_2 == 1);
+      Off(OUT_A);
+    } else if (SENSOR_2 == 1){
+      Off(OUT_A);
+      until (SENSOR_3 == 1);
+      Off(OUT_B);
+    }
+    OnFwdSync(OUT_AB, -50, 0);
+    until (SensorUS(IN_1)==15);
+    Off(OUT_AB);
+    /* while (SensorUS(IN_1)<60);
+    while (SensorUS(IN_1)>60);
+    Off(OUT_B);
+    while (shortestDistance!=currentDistance){
+      RotateMotor(OUT_B, 30, motorDegrees);
+      Off(OUT_B);
+      currentDistance = SensorUS(IN_1);
+      NumOut(0,0,currentDistance);
+    } */
+    //RotateMotor(OUT_B, -30, (motorDegrees*3));
     return shortestDistance;
 }
 
 /*
 float AngleCalculate(float x, float y){
-    return atand(y-15/x);
-}
-
+    return atand((y-15)/x);
+} */
+/*
 float HypotenuseCalculate(float x, float y)
 {
     return sqrt(x*x+(y-15)*(y-15));
@@ -94,13 +125,16 @@ void aimRobot(float distance, float angle){
 
      // To right
     if(distance > 0){
-
-        RotateMotor(OUT_A, 75, (180-motorDegrees));
+      if(angle>0){
+        RotateMotor(OUT_A, -50, motorDegrees);
+      } else{
+        RotateMotor(OUT_A, 50, -motorDegrees);
+      }
 
     // To left
     } else if (distance < 0){
 
-        RotateMotor(OUT_B, 75, (180-motorDegrees));
+        RotateMotor(OUT_B, -50, motorDegrees);
     }
 }
 
@@ -114,9 +148,25 @@ float findMotorDegrees(float angle){
      return motorDegrees;
 
 }
-void driveStraight(float distance){
-      OnFwdSync(OUT_AB, -75, 0);
-
-      // Ersätt 4000 med en funktion "avstånd till tid" eller liknande
+int driveStraight(float distance){
+      //RotateMotorEx(OUT_AB, -25, 3600, 0, false, true);
+      OnFwdSync(OUT_AB, -50, 0);
       Wait(distance);
+      int x = MotorRotationCount(OUT_A);
+      Off(OUT_AB);
+      NumOut(0,0,x);
+      return x;
+}
+void driveBack(float distance){
+      //RotateMotorEx(OUT_AB, -25, 3600, 0, false, true);
+      OnFwdSync(OUT_AB, 50, 0);
+      Wait(distance);
+      int x = MotorRotationCount(OUT_A);
+      Off(OUT_AB);
+      NumOut(0,0,x);
+}
+void dropBook(void){
+  OnFwd(OUT_C, -40);
+  Wait(3000);
+  Off(OUT_C);
 }
