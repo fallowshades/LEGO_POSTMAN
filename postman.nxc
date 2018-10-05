@@ -47,7 +47,7 @@ task main()
     chooseWall(currentAddress[0]);
     aimRobot(currentAddress[1], 90);
     deliverBook(currentAddress[1], currentAddress[0], 90);
-    aimRobot(currentAddress[1], -90);
+    //aimRobot(currentAddress[1], -90);
     backToStart(currentAddress[0]);
 
 }
@@ -56,6 +56,7 @@ int findNearestWall(void){
     int currentDistance;
     int shortestDistance;
     int count;
+    int startC;
     float motorDegrees = findMotorDegrees(9);
 
     OnFwd(OUT_B, 40);
@@ -71,12 +72,9 @@ int findNearestWall(void){
       currentDistance = SensorUS(IN_1);
     }
     Off(OUT_B);
-    ResetRotationCount(OUT_B);
+    startC=MotorRotationCount(OUT_B);
     OnFwd(OUT_B, -50);
-    /* until(shortestDistance==currentDistance){
-      NumOut(0,0,currentDistance);
-      currentDistance = SensorUS(IN_1);
-    } */
+
     Wait(500);
     currentDistance = SensorUS(IN_1);
     until(shortestDistance<currentDistance){
@@ -84,17 +82,9 @@ int findNearestWall(void){
       currentDistance = SensorUS(IN_1);
     }
     Off(OUT_B);
-    count=MotorRotationCount(OUT_B);
+    count=MotorRotationCount(OUT_B)-startC;
     RotateMotor(OUT_B, 30, (count/2));
-    /* do {
-      shortestDistance = currentDistance;
-      NumOut(0,0,currentDistance);
-      RotateMotor(OUT_B, 30, motorDegrees);
-      Off(OUT_B);
-      Wait(500);
-      currentDistance = SensorUS(IN_1);
-    }while (shortestDistance>=currentDistance); */
-    //RotateMotor(OUT_B, -30, (motorDegrees*3));
+
     crashIntoWall();
 
     return shortestDistance;
@@ -131,14 +121,14 @@ void crashIntoWall(void){
 
 void aimRobot(float distance, float angle){
     float motorDegrees = findMotorDegrees(angle);
-    // To right
+    // To left
     if(distance < 0){
       if(angle>0){
         RotateMotor(OUT_A, -50, motorDegrees);
       } else{
         RotateMotor(OUT_A, 50, -motorDegrees);
       }
-    // To left
+    // To right
     } else if (distance > 0){
       if(angle>0){
         RotateMotor(OUT_B, -50, motorDegrees);
@@ -168,22 +158,31 @@ void deliverBook(float distance, int wall, float angle){
 
       for (int i = 2; i>0; i--){
         OnFwdSync(OUT_AB, 70,0);
-        until(MotorRotationCount(OUT_A)>=(count-(dist/i)));
+        until(MotorRotationCount(OUT_A)>=count+dist/i);
         Off(OUT_AB);
         aimRobot(distance, -angle);
-
         crashIntoWall();
-
-        aimRobot(distance, angle);
+        if(i!=1){
+          aimRobot(distance, angle);
+        }else{
+          aimRobot(distance, -angle);
+        }
       }
-
 
       dropBook();
 
-      OnFwdSync(OUT_AB, 70,0);
-      until(MotorRotationCount(OUT_A)>=count);
-      Off(OUT_AB);
+      count = MotorRotationCount(OUT_A);
 
+      for (int i = 2; i>0; i--){
+        OnFwdSync(OUT_AB, 70,0);
+        until(MotorRotationCount(OUT_A)>=count+dist/i);
+        Off(OUT_AB);
+        aimRobot(distance, angle);
+        crashIntoWall();
+        if(i!=1){
+          aimRobot(distance, angle);
+        }
+      }
 }
 
 void dropBook(void){
@@ -194,11 +193,11 @@ void dropBook(void){
 
 void backToStart(int wall){
   if (wall == 0){
-    OnFwdSync(OUT_AB, -50, 0);
+    //OnFwdSync(OUT_AB, -50, 0);
     float motorDegrees = findMotorDegrees(90);
     RotateMotor(OUT_A, 50, motorDegrees);
     RotateMotor(OUT_B, -50, motorDegrees);
-    OnFwdSync(OUT_AB, -50, 0);
+    OnFwdSync(OUT_AB, 50, 0);
     until (SensorUS(IN_1)==50);
     Off(OUT_AB);
   } else {
